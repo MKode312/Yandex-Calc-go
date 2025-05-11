@@ -17,7 +17,7 @@ func Evaluate(expr string) (float64, error) {
 			}
 			op1 := stack.Pop()
 			op2 := stack.Pop()
-			ans, err := Calculate(op1, op2, token)
+			ans, err := Calculate(op2, op1, token)
 			if err != nil {
 				return 0, err
 			}

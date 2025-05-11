@@ -116,3 +116,19 @@ func (s *Storage) DeleteExpression(ctx context.Context, id int64) error {
 
 	return nil
 }
+
+// SelectExpressionByID - returns a single expression by its ID from the database
+func (s *Storage) SelectExpressionByID(ctx context.Context, id int64) (*Expression, error) {
+	var (
+		q = `SELECT id, userid, expression, answer, date, status FROM expressions WHERE id = $1`
+		e  Expression
+	)
+
+	row := s.Db.QueryRowContext(ctx, q, id)
+	err := row.Scan(&e.ID, &e.UserID, &e.Expression, &e.Answer, &e.Date, &e.Status)
+	if err != nil {
+		return nil, err
+	}
+
+	return &e, nil
+}

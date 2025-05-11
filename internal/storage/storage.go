@@ -21,6 +21,7 @@ type ExpressionInteractor interface {
 	DeleteExpression(ctx context.Context, id int64) error
 	UpdateExpression(ctx context.Context, answer, status string, id int64,) error
 	SelectAllExpressions(ctx context.Context) ([]Expression, error)
+	SelectExpressionByID(ctx context.Context, id int64) (*Expression, error)
 }
 
 // New - creates new database in the given storagePath with tables

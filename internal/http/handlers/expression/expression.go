@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"calculator_go/internal/storage"
+	"calculator_go/internal/utils/agent/validator"
 	"calculator_go/internal/utils/orchestrator/manager"
 	"context"
 	"encoding/json"
@@ -23,11 +24,11 @@ type Request struct {
 }
 
 type ResponseData struct {
-	ID 		   int64  `json:"id"`
+	ID         int64  `json:"id"`
 	Expression string `json:"expression"`
-	Result 	   string `json:"result"`
-	Date 	   string `json:"date"`
-	Status 	   string `json:"status"`
+	Result     string `json:"result"`
+	Date       string `json:"date"`
+	Status     string `json:"status"`
 }
 
 // must be somewhere else than here
@@ -62,11 +63,16 @@ func CreateExpressionHandler(ctx context.Context, expressionSaver storage.Expres
 			return
 		}
 
+		if !validator.IsValidExpression(req.Expression) {
+			http.Error(w, "Invalid expression", http.StatusBadRequest)
+			return
+		}
+
 		var expressionStruct = storage.Expression{
-			UserID:    userID,
+			UserID:     userID,
 			Expression: req.Expression,
 			Answer:     null,
-			Date:      date.Format("2006/01/02 15:04:05"),
+			Date:       date.Format("2006/01/02 15:04:05"),
 			Status:     stored,
 		}
 
@@ -76,13 +82,13 @@ func CreateExpressionHandler(ctx context.Context, expressionSaver storage.Expres
 			return
 		}
 
-        go manager.Manage(ctx, expressionSaver, agentAddress())
+		go manager.Manage(ctx, expressionSaver, agentAddress())
 
-        response := map[string]int64{"id": id}
-        w.WriteHeader(http.StatusCreated)
-        json.NewEncoder(w).Encode(response)
-        log.Printf("Successful CreateExpressionHandler operation; id = %d", id)
-    }
+		response := map[string]int64{"id": id}
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(response)
+		log.Printf("Successful CreateExpressionHandler operation; id = %d", id)
+	}
 }
 
 func GetExpressionsHandler(ctx context.Context, expressionSaver storage.ExpressionInteractor) http.HandlerFunc {
@@ -113,16 +119,15 @@ func GetExpressionsHandler(ctx context.Context, expressionSaver storage.Expressi
 
 		for _, expr := range allExpressions {
 			resp := ResponseData{
-				ID: expr.ID,
+				ID:         expr.ID,
 				Expression: expr.Expression,
-				Result: expr.Answer,
-				Date: expr.Date,
-				Status: expr.Status,
+				Result:     expr.Answer,
+				Date:       expr.Date,
+				Status:     expr.Status,
 			}
 
 			respData = append(respData, resp)
 		}
-
 
 		json.NewEncoder(w).Encode(respData)
 		log.Print("Successful GetExpressionsHandler operation")
@@ -130,7 +135,6 @@ func GetExpressionsHandler(ctx context.Context, expressionSaver storage.Expressi
 }
 
 func DeleteExpressionHandler(ctx context.Context, expressionSaver storage.ExpressionInteractor) http.HandlerFunc {
-	
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
@@ -148,14 +152,22 @@ func DeleteExpressionHandler(ctx context.Context, expressionSaver storage.Expres
 			return
 		}
 
-		err = expressionSaver.DeleteExpression(ctx, int64(expressionID))
+		// Проверка на существование выражения
+		expression, err := expressionSaver.SelectExpressionByID(ctx, int64(expressionID))
+		if err != nil {
+			http.Error(w, "Expression with this id was not found", http.StatusNotFound)
+			return
+		}
+
+		// Удаление выражения
+		err = expressionSaver.DeleteExpression(ctx, int64(expression.ID))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
 		w.WriteHeader(http.StatusAccepted)
-		response := map[string]int64{"Expression with this id was successfully deleted": expressionID}
+		response := map[string]int64{"Expression with this id was successfully deleted": expression.ID}
 		json.NewEncoder(w).Encode(response)
 		log.Print("Successful DeleteExpressionHandler operation")
 	}
