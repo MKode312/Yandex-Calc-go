@@ -26,11 +26,8 @@ func main() {
 
 	r := chi.NewRouter()
 
-	// Обновленные маршруты для регистрации и входа
 	r.Post("/api/v1/register", authHandler.RegisterUserHandler(ctx, db))
 	r.Post("/api/v1/login", authHandler.LoginUserHandler(ctx, db))
-
-	// Используем middleware для авторизации
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.AuthorizeJWTToken)
 
