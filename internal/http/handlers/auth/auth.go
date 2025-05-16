@@ -12,7 +12,6 @@ type Request struct {
 	Password string `json:"password"`
 }
 
-//go:generate go run github.com/vektra/mockery/v2@v2.28.2 --name=UserInteractor
 type UserInteractor interface {
 	RegisterUser(ctx context.Context, uname, pswrd string) error
 	LoginUser(ctx context.Context, uname, pswrd string) (string, error)
@@ -29,7 +28,6 @@ func RegisterUserHandler(ctx context.Context, userInteractor UserInteractor) htt
 			return
 		}
 
-		// Проверка на наличие полей username и password
 		if req.Login == "" || req.Password == "" {
 			http.Error(w, "Username and password are required", http.StatusBadRequest)
 			return
@@ -59,7 +57,6 @@ func LoginUserHandler(ctx context.Context, userInteractor UserInteractor) http.H
             return
         }
 
-		// Проверка на наличие полей username и password
 		if req.Login == "" || req.Password == "" {
 			http.Error(w, "Username and password are required", http.StatusBadRequest)
 			return
@@ -80,7 +77,6 @@ func LoginUserHandler(ctx context.Context, userInteractor UserInteractor) http.H
 			Secure:   true,
 		})
 
-        // Возвращаем токен в ответе вместо установки cookie.
         response := map[string]string{"token": token}
         json.NewEncoder(w).Encode(response)
 
