@@ -10,10 +10,9 @@ import (
 
 var (
 	secretKey = os.Getenv("JWT_SECRET_KEY")
-	tokenExpire = 10 * time.Minute // you may change this if you want
+	tokenExpire = 10 * time.Minute
 )
 
-// GenerateJWTToken generates a new jwt token for user
 func GenerateJWTToken(userID int64) (string, error) {
 
 	now := time.Now()
@@ -33,7 +32,6 @@ func GenerateJWTToken(userID int64) (string, error) {
 	return tokenString, nil
 }
 
-// VerifyJWTToken verifies jwt token (used in middleware)
 func VerifyJWTToken(tokenString string) (string, error) {
 
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
