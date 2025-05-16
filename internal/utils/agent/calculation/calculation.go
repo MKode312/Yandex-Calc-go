@@ -38,7 +38,6 @@ func Evaluate(expr string) (float64, error) {
 	return stack.Pop(), nil
 }
 
-// Calculate - вычисляет
 func Calculate(op1 float64, op2 float64, operator string) (float64, error) {
 	switch operator {
 	case "+":
