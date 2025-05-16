@@ -7,15 +7,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Model methods for users table in database
-
 type User struct {
 	ID 		 int64
 	Name 	 string
 	Password string
 }
 
-// RegisterUser inserts a new user into database when it registers
 func (s *Storage) RegisterUser(ctx context.Context, uname, pswrd string) error {
 
 	q := `
@@ -35,7 +32,6 @@ func (s *Storage) RegisterUser(ctx context.Context, uname, pswrd string) error {
 	return nil
 }
 
-// LoginUser selects a user from database and generates new jwt token for him
 func (s *Storage) LoginUser(ctx context.Context, uname, pswrd string) (string, error) {
 
 	q := `
