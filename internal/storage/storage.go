@@ -8,13 +8,10 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// Model functions for initializing database and its tables
-
 type Storage struct {
 	Db *sql.DB
 }
 
-// Methods for interactions with database
 type ExpressionInteractor interface { 
 	InsertExpression(ctx context.Context, expr *Expression) (int64, error)
 	SelectExpressionsByID(ctx context.Context, userID int64) ([]Expression, error)
@@ -24,7 +21,6 @@ type ExpressionInteractor interface {
 	SelectExpressionByID(ctx context.Context, id int64) (*Expression, error)
 }
 
-// New - creates new database in the given storagePath with tables
 func New(storagePath string) (*Storage, error) {
 	const op = "storage/storage-New"
 	ctx := context.TODO()
@@ -46,7 +42,6 @@ func New(storagePath string) (*Storage, error) {
 	return &Storage{Db: db}, nil
 }
 
-// createTables - pops up two tables in the given database
 func createTables(ctx context.Context, db *sql.DB) error {
 	const (
 		usersTable = `
