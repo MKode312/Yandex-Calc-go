@@ -4,18 +4,15 @@ import (
 	"context"
 )
 
-// Model methods for expressions table in database
-
 type Expression struct {
 	ID         int64
 	UserID     int64
 	Expression string
-	Answer     string // Types: null, {answer}
+	Answer     string
 	Date       string
-	Status     string // Types: stored, done, error
+	Status     string 
 }
 
-// InsertExpression - putting new expression into database table
 func (s *Storage) InsertExpression(ctx context.Context, expr *Expression) (int64, error) {
 
 	var q = `
@@ -35,7 +32,6 @@ func (s *Storage) InsertExpression(ctx context.Context, expr *Expression) (int64
 	return id, nil
 }
 
-// SelectExpressions - returns all expressions slice from database table
 func (s *Storage) SelectAllExpressions(ctx context.Context) ([]Expression, error) {
 
 	var (
@@ -62,7 +58,6 @@ func (s *Storage) SelectAllExpressions(ctx context.Context) ([]Expression, error
 	return expressions, nil
 }
 
-// SelectExpressionByID - guess yourself :)
 func (s *Storage) SelectExpressionsByID(ctx context.Context, userID int64) ([]Expression, error) {
 
 	var ( 
@@ -89,7 +84,6 @@ func (s *Storage) SelectExpressionsByID(ctx context.Context, userID int64) ([]Ex
 	return expressions, nil
 }
 
-// UpdateExpression - updates data about expression, specifically its answer and/or status
 func (s *Storage) UpdateExpression(
 	ctx context.Context, answer, status string, id int64,
 ) error {
@@ -104,7 +98,6 @@ func (s *Storage) UpdateExpression(
 	return nil
 }
 
-// DeleteExpression - deletes expression row from database table
 func (s *Storage) DeleteExpression(ctx context.Context, id int64) error {
 
 	var q = `DELETE FROM expressions WHERE id = ?`
@@ -117,7 +110,6 @@ func (s *Storage) DeleteExpression(ctx context.Context, id int64) error {
 	return nil
 }
 
-// SelectExpressionByID - returns a single expression by its ID from the database
 func (s *Storage) SelectExpressionByID(ctx context.Context, id int64) (*Expression, error) {
 	var (
 		q = `SELECT id, userid, expression, answer, date, status FROM expressions WHERE id = $1`
