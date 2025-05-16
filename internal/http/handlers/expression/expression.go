@@ -17,8 +17,6 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
-// Handlers for operations with expressions
-
 type Request struct {
 	Expression string `json:"expression"`
 }
@@ -31,13 +29,10 @@ type ResponseData struct {
 	Status     string `json:"status"`
 }
 
-// must be somewhere else than here
 var (
 	null   = "null"
 	stored = "stored"
 )
-
-// CreateExpressionHandler - post method handler which stores an expression
 
 func CreateExpressionHandler(ctx context.Context, expressionSaver storage.ExpressionInteractor) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -151,15 +146,12 @@ func DeleteExpressionHandler(ctx context.Context, expressionSaver storage.Expres
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-
-		// Проверка на существование выражения
 		expression, err := expressionSaver.SelectExpressionByID(ctx, int64(expressionID))
 		if err != nil {
 			http.Error(w, "Expression with this id was not found", http.StatusNotFound)
 			return
 		}
 
-		// Удаление выражения
 		err = expressionSaver.DeleteExpression(ctx, int64(expression.ID))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
