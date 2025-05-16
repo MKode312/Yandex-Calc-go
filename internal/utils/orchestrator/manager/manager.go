@@ -9,7 +9,6 @@ import (
 	"calculator_go/internal/storage"
 )
 
-// all this status must be somewhere else than here
 var (
 	trouble = "error"
 	done    = "done"
